@@ -6,4 +6,14 @@ import java.util.List;
 
 public interface SpeakerService {
     List<Speaker> findAll();
+
+    Speaker create(Speaker speaker);
+
+    Speaker getSpeaker(int id);
+
+    Speaker update(Speaker speaker);
+
+    void batch();
+
+    void delete(int id);
 }

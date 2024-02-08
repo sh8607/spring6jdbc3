@@ -12,15 +12,25 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class Spring6jdbc3ApplicationTests {
+
+    @Test
+    public void testCreateSpeaker() {
+        RestTemplate restTemplate = new RestTemplate();
+        Speaker speaker = new Speaker();
+        speaker.setName("Bob Smith");
+        speaker = restTemplate.postForObject("http://localhost:8080/speaker", speaker, Speaker.class);
+        System.out.println(speaker.getName());
+
+    }
 
     @Test
     void testGetSpeakers() {
         RestTemplate restTemplate = new RestTemplate();
 
         ResponseEntity<List<Speaker>> speakersResponse = restTemplate.exchange(
-                "http://localhost:8080/", HttpMethod.GET,
+                "http://localhost:8080/speaker", HttpMethod.GET,
                 null, new ParameterizedTypeReference<List<Speaker>>() {
                 });
 
@@ -32,4 +42,39 @@ class Spring6jdbc3ApplicationTests {
             System.out.println("Speaker name: " + speaker.getName());
         }
     }
+
+    @Test
+    void testGetSpeaker() {
+        RestTemplate restTemplate = new RestTemplate();
+        Speaker speaker = restTemplate.getForObject("http://localhost:8080/speaker/{id}", Speaker.class, 13);
+        System.out.println(speaker.getName() + " " + speaker.getSkill());
+    }
+
+    @Test
+    void testUpdateSpeaker() {
+        RestTemplate restTemplate = new RestTemplate();
+        Speaker speaker = restTemplate.getForObject("http://localhost:8080/speaker/{id}", Speaker.class, 13);
+        speaker.setName(speaker.getName() + " Sr.");
+        restTemplate.put("http://localhost:8080/speaker", speaker);
+        System.out.println(speaker.getName());
+    }
+
+    @Test
+    public void testBatchUpdate() {
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.getForObject("http://localhost:8080/speaker/batch", Object.class);
+    }
+
+    @Test
+    void testDeleteSpeaker() {
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.delete("http://localhost:8080/speaker/delete/{id}",  15);
+    }
+
+    @Test
+    void testException() {
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.getForObject("http://localhost:8080/speaker/test",  Speaker.class);
+    }
+
 }
